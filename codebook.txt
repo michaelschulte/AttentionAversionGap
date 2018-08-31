@@ -1,0 +1,23 @@
+# Codebook  
+
+  # id: unique task id (continous)
+  # expname: counterbalancing information, e.g., Va1 and Vb1 have different counterbalancing orders 
+  # subject: subject ID <- CHECK WHETHER UNIQUE ACROSS STUDIES
+  # choice: choice of gamble A or B <- RENAME TO ENGLISH
+  # submitted: when was experiment done
+  # event: four distinct event mouselabweb delivers: mouseout onclick click submit
+  # boxname: differentiate buttons from cells: "bB" "bA" Cells: "b1" "b2" "a2" "a3" "a4" "b4" "b3" "a1" 
+  # boxin: when was box entered during each trial
+  # boxtime: how long was box open during each trial
+  # counter: enumerated aquisitions per trial
+  # task: task number 
+  # version: vertical or horizontal setup
+  # trial: 1 or 2 (each subject did all 91/121 gambles twice three weeks apart)
+  # order: different counterbalancing version
+  # type: cell information: Button: "bA", "bB" Cell: "O"  "P"  
+  # celltype: numerical version of type
+  # option: which gamble problem option a or b
+  # cell: enumerated cells
+  # celltypeF: added pos and neg to celltype
+  # gambletype: gain, loss, mixed gamble
+  # study: old / mouseover / click
