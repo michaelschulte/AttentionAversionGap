@@ -1,9 +1,9 @@
-# Codebook  
+# Loss Vigilance
+# Michael Schulte-Mecklenbeck, Tomas Lejarraga
+# Codebook rawclean100.Rdata 
 
-  # id: unique task id (continous)
-  # expname: counterbalancing information, e.g., Va1 and Vb1 have different counterbalancing orders 
-  # subject: subject ID <- CHECK WHETHER UNIQUE ACROSS STUDIES
-  # choice: choice of gamble A or B <- RENAME TO ENGLISH
+  # id: unique task id
+  # choice: choice of gamble A or B
   # submitted: when was experiment done
   # event: four distinct event mouselabweb delivers: mouseout onclick click submit
   # boxname: differentiate buttons from cells: "bB" "bA" Cells: "b1" "b2" "a2" "a3" "a4" "b4" "b3" "a1" 
@@ -21,3 +21,10 @@
   # celltypeF: added pos and neg to celltype
   # gambletype: gain, loss, mixed gamble
   # study: old / mouseover / click
+  # subject: subject ID  
+  # actual_value: outcome or probability actually shown in trial and cell 
+  # category: size of outcome (small, middle, large) within interval of [-100:100]
+  # time_corrected: proper time format
+  # flag: start of a trial
+  # position: task position in trial
+  # position_gamble: relative task position in a trial categorized into three times: early, middle, late wihtin interval of [1:90]  
