@@ -19,9 +19,10 @@
   lotteryproblems <- read.table("data/LotteryProblems_boxvalue.csv", header=TRUE, sep=',')
 
   # merge rawclean file with lottery problems
-  rawdata <- 
-  rawdata %>%
-    left_join(lotteryproblems, by = c('task', 'boxname'))
+  rawdata <- merge(rawdata, lotteryproblems, 
+                   by.x = c("task", "boxname"), 
+                   by.y = c("task", "boxname"), 
+                   all.x = TRUE)
   
 # remove very short acquisitions <100ms on acquisition level
   rawclean  <- 
