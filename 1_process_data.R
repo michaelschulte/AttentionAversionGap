@@ -17,7 +17,7 @@
   # fusion gamble information into rawdata frame
   # Number: gamble number [1:91]
   lotteryproblems <- read.table("data/LotteryProblems_boxvalue.csv", header=TRUE, sep=',')
-
+ 
   # merge rawclean file with lottery problems
   rawdata <- merge(rawdata, lotteryproblems, 
                    by.x = c("task", "boxname"), 

@@ -29,7 +29,7 @@ library(tidyverse)
     scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
     theme_minimal(base_family = 'mono', base_size = 18) +
     theme(legend.position="none")
-    
+     
   ggsave(file = 'plots/gain_loss.png', height = 5, width = 10)
   
   #  Figures - mixed ----  
