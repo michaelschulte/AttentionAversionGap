@@ -7,7 +7,7 @@
   library(lubridate)
   
 # load data from three experiments
-  load('data/rawdata.Rdata')
+  rawdata <- read_csv('data/rawdata.csv')
 
 # remove participants based on less thank 90% choices made
   rawdata <- 
@@ -37,19 +37,6 @@
   rawclean %>%
     filter(boxtime < mean_boxtime + 2*sd_boxtime) 
 
-# code actual values into 3 groups (small, middle, large)
-  rawclean <- 
-    rawclean %>%
-    mutate(
-      category = case_when(
-        actual_value %in% c(67:100)   ~ "large",
-        actual_value %in% c(33:66)    ~ "middle",
-        actual_value %in% c(1:33)     ~ "small",
-        actual_value %in% c(-1:-33)   ~ "small",
-        actual_value %in% c(-33:-66)  ~ "middle",
-        actual_value %in% c(-67:-100) ~ "large")
-    )
-  
 # remove button events
   rawclean <-  
     rawclean %>%
