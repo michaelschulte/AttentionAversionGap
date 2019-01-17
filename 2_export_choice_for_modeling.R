@@ -3,8 +3,11 @@
 # format for WinBugs
 # block of gain gambles, then loss gambles, then mixed gambles.
 
+# load library
+library(tidyverse)
+
 # load rawdata
-  load('data/rawclean.Rdata')
+load('data/rawclean.Rdata')
 
 # generate summary df to see missing choices
 short <- 
@@ -162,6 +165,57 @@ gambleA <-
 gambleB <- 
   gambles %>%
   select('oB1', 'pB1', 'oB2', 'pB2')
+
+# Rank-order outcomes in preparation for cummulative prospect theory
+# Gamble A
+gambleA$oA1_n <- ifelse(gambleA$oA1 >= 0 & gambleA$oA2 >= 0,
+                        ifelse(gambleA$oA1 > gambleA$oA2, gambleA$oA1, gambleA$oA2),
+                        ifelse(gambleA$oA1 <= 0 & gambleA$oA2 <= 0,
+                               ifelse(gambleA$oA1 < gambleA$oA2, gambleA$oA1, gambleA$oA2),
+                               ifelse(gambleA$oA1 > gambleA$oA2, gambleA$oA1, gambleA$oA2)))
+gambleA$pA1_n <- ifelse(gambleA$oA1 >= 0 & gambleA$oA2 >= 0,
+                        ifelse(gambleA$oA1 > gambleA$oA2, gambleA$pA1, gambleA$pA2),
+                        ifelse(gambleA$oA1 <= 0 & gambleA$oA2 <= 0,
+                               ifelse(gambleA$oA1 < gambleA$oA2, gambleA$pA1, gambleA$pA2),
+                               ifelse(gambleA$oA1 > gambleA$oA2, gambleA$pA1, gambleA$pA2)))
+gambleA$oA2_n <- ifelse(gambleA$oA1 >= 0 & gambleA$oA2 >= 0,
+                        ifelse(gambleA$oA1 > gambleA$oA2, gambleA$oA2, gambleA$oA1),
+                        ifelse(gambleA$oA1 <= 0 & gambleA$oA2 <= 0,
+                               ifelse(gambleA$oA1 < gambleA$oA2, gambleA$oA2, gambleA$oA1),
+                               ifelse(gambleA$oA1 > gambleA$oA2, gambleA$oA2, gambleA$oA1)))
+gambleA$pA2_n <- ifelse(gambleA$oA1 >= 0 & gambleA$oA2 >= 0,
+                        ifelse(gambleA$oA1 > gambleA$oA2, gambleA$pA2, gambleA$pA1),
+                        ifelse(gambleA$oA1 <= 0 & gambleA$oA2 <= 0,
+                               ifelse(gambleA$oA1 < gambleA$oA2, gambleA$pA2, gambleA$pA1),
+                               ifelse(gambleA$oA1 > gambleA$oA2, gambleA$pA2, gambleA$pA1)))
+
+gambleA$oA1 <- NULL; gambleA$pA1 <- NULL; gambleA$oA2 <- NULL; gambleA$pA2 <- NULL
+colnames(gambleA) <- c("oA1", "pA1", "oA2", "pA2")
+
+# Gamble B
+gambleB$oB1_n <- ifelse(gambleB$oB1 >= 0 & gambleB$oB2 >= 0,
+                        ifelse(gambleB$oB1 > gambleB$oB2, gambleB$oB1, gambleB$oB2),
+                        ifelse(gambleB$oB1 <= 0 & gambleB$oB2 <= 0,
+                               ifelse(gambleB$oB1 < gambleB$oB2, gambleB$oB1, gambleB$oB2),
+                               ifelse(gambleB$oB1 > gambleB$oB2, gambleB$oB1, gambleB$oB2)))
+gambleB$pB1_n <- ifelse(gambleB$oB1 >= 0 & gambleB$oB2 >= 0,
+                        ifelse(gambleB$oB1 > gambleB$oB2, gambleB$pB1, gambleB$pB2),
+                        ifelse(gambleB$oB1 <= 0 & gambleB$oB2 <= 0,
+                               ifelse(gambleB$oB1 < gambleB$oB2, gambleB$pB1, gambleB$pB2),
+                               ifelse(gambleB$oB1 > gambleB$oB2, gambleB$pB1, gambleB$pB2)))
+gambleB$oB2_n <- ifelse(gambleB$oB1 >= 0 & gambleB$oB2 >= 0,
+                        ifelse(gambleB$oB1 > gambleB$oB2, gambleB$oB2, gambleB$oB1),
+                        ifelse(gambleB$oB1 <= 0 & gambleB$oB2 <= 0,
+                               ifelse(gambleB$oB1 < gambleB$oB2, gambleB$oB2, gambleB$oB1),
+                               ifelse(gambleB$oB1 > gambleB$oB2, gambleB$oB2, gambleB$oB1)))
+gambleB$pB2_n <- ifelse(gambleB$oB1 >= 0 & gambleB$oB2 >= 0,
+                        ifelse(gambleB$oB1 > gambleB$oB2, gambleB$pB2, gambleB$pB1),
+                        ifelse(gambleB$oB1 <= 0 & gambleB$oB2 <= 0,
+                               ifelse(gambleB$oB1 < gambleB$oB2, gambleB$pB2, gambleB$pB1),
+                               ifelse(gambleB$oB1 > gambleB$oB2, gambleB$pB2, gambleB$pB1)))
+
+gambleB$oB1 <- NULL; gambleB$pB1 <- NULL; gambleB$oB2 <- NULL; gambleB$pB2 <- NULL
+colnames(gambleB) <- c("oB1", "pB1", "oB2", "pB2")
 
 write_delim(gambleA, ('CPTModeling/GambleA.txt'), delim = '\t', col_names = FALSE)
 write_delim(gambleB, ('CPTModeling/GambleB.txt'), delim = '\t', col_names = FALSE)
