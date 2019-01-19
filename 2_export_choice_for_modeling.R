@@ -245,38 +245,3 @@ data$outcome_1 <- ifelse(data$V1 >= 0 & data$V3 >= 0, data$V1,
 data$outcome_2 <- ifelse(data$V1 >= 0 & data$V3 >= 0, data$V3,
                          ifelse(data$V1 <= 0 & data$V3 <= 0, data$V3,
                                 ifelse(data$V3 > 0, data$V1, data$V3)))
-
-
-
-# MOVE THIS TO separate file !
-
-
-# load parameter data ----
-click_conv <- read_csv('data/Parameter_CLICK_subject_conversion.csv')
-click_para <- read_csv('data/Parameter_CLICK.csv')
-mouse_conv <- read_csv('data/Parameter_MOUSE_subject_conversion.csv')
-mouse_para <- read_csv('data/Parameter_MOUSE.csv')
-
-# fusion parameter and subject ID data
-click <- 
-  click_para %>%
-  left_join(click_conv, by = c('thorsten.numbers' = 'subject')) %>%
-  select(thorsten.num, trial, lambda) %>%
-  group_by(thorsten.num) %>%
-  summarise(lambda = mean(lambda)) %>%
-  rename('subject' = 'thorsten.num') %>%
-  mutate(condition = 'Click')
-
-mouse <- 
-  mouse_para %>%
-  left_join(mouse_conv, by = c('thorsten.numbers' = 'subject')) %>%
-  select(thorsten.num, trial, lambda) %>%
-  group_by(thorsten.num) %>%
-  rename('subject' = 'thorsten.num') %>%
-  summarise(lambda = mean(lambda)) %>%
-  mutate(condition = 'Mouse')    
-
-parameters <- bind_rows(mouse, click)
-
-# save parameters
-save(parameters, file = 'data/parameters.Rdata')      

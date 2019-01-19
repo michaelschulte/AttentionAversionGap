@@ -5,6 +5,42 @@
 # packages
 library(tidyverse)
 
+
+# Preparation for data fusion
+
+# load parameter data ----
+click_conv <- read_csv('data/Parameter_CLICK_subject_conversion.csv')
+click_para <- read_csv('data/Parameter_CLICK.csv')
+mouse_conv <- read_csv('data/Parameter_MOUSE_subject_conversion.csv')
+mouse_para <- read_csv('data/Parameter_MOUSE.csv')
+
+# fusion parameter and subject ID data
+click <- 
+  click_para %>%
+  left_join(click_conv, by = c('thorsten.numbers' = 'subject')) %>%
+  select(thorsten.num, trial, lambda) %>%
+  group_by(thorsten.num) %>%
+  summarise(lambda = mean(lambda)) %>%
+  rename('subject' = 'thorsten.num') %>%
+  mutate(condition = 'Click')
+
+mouse <- 
+  mouse_para %>%
+  left_join(mouse_conv, by = c('thorsten.numbers' = 'subject')) %>%
+  select(thorsten.num, trial, lambda) %>%
+  group_by(thorsten.num) %>%
+  rename('subject' = 'thorsten.num') %>%
+  summarise(lambda = mean(lambda)) %>%
+  mutate(condition = 'Mouse')    
+
+parameters <- bind_rows(mouse, click)
+
+# save parameters
+save(parameters, file = 'data/parameters.Rdata')      
+
+
+
+
 # load data from three experiments
   load('data/rawclean.Rdata')
   gambles <- read_csv('data/LotteryProblems.csv')
@@ -29,7 +65,7 @@ library(tidyverse)
     theme_minimal(base_family = 'mono', base_size = 18) +
     theme(legend.position="none")
      
-  ggsave(file = 'plots/gain_loss.png', height = 5, width = 10)
+  #ggsave(file = 'plots/gain_loss.png', height = 5, width = 10)
   
   #  Figures - mixed ----  
   
@@ -53,7 +89,7 @@ library(tidyverse)
     theme_minimal(base_family = 'mono', base_size = 18) +
     theme(legend.position="none")
   
-  ggsave(file = 'plots/mixed.png', height = 5, width = 10)
+  #ggsave(file = 'plots/mixed.png', height = 5, width = 10)
   
 # Figures - pos_neg within ----
   
@@ -82,7 +118,7 @@ library(tidyverse)
     facet_grid(. ~ type) +
     theme_minimal(base_family = 'mono', base_size = 18) 
   
-  ggsave('plots/gain_loss_within.png', height = 5, width = 10)  
+  #ggsave('plots/gain_loss_within.png', height = 5, width = 10)  
   
 # Parameters versus attention ----
  # michael's replication version + tomas' nice version 
@@ -106,13 +142,14 @@ library(tidyverse)
       group_by(subject, gambletype, mean_median_lambda) %>%
       summarise(av_time = mean(time)) %>%
       spread(gambletype, av_time) %>%
-      mutate(diff_time = gain - loss)
+      mutate(diff_time = loss/gain)
     
-      open_time$line <- ifelse(open_time$diff_time > 0, 0,
-                             ifelse(open_time$diff_time < 0, 1, "NA"))
+    open_time$line <- ifelse(open_time$diff_time < 1, 0,
+                             ifelse(open_time$diff_time > 1, 1, "NA"))
     
       
       # Opening time: counting cases
+      open_time <- subset(open_time, mean_median_lambda > 0) # Corrected 16/01/2019
       la_la <- round(nrow(subset(open_time, line == 1 & mean_median_lambda > 1))/nrow(open_time), 2)*100 # Loss attention & loss aversion
       la_gs <- round(nrow(subset(open_time, line == 1 & mean_median_lambda < 1))/nrow(open_time), 2)*100 # Loss attention & gain seeking
       ga_la <- round(nrow(subset(open_time, line == 0 & mean_median_lambda > 1))/nrow(open_time), 2)*100 # Gain attention & loss aversion
@@ -123,18 +160,18 @@ library(tidyverse)
         xlab(paste('Relative box opening time')) +
         ylab(expression(paste("Loss aversion (",lambda, ") "))) +
         annotate("rect", xmin=-Inf, xmax=Inf, ymin=1, ymax=Inf, fill = "dark grey", alpha = 0.3) +
-        annotate("rect", xmin=-Inf, xmax=0, ymin=-Inf, ymax=Inf, fill = "lightblue", alpha = 0.3) +
+        annotate("rect", xmin=1, xmax=Inf, ymin=-Inf, ymax=Inf, fill = "lightblue", alpha = 0.3) +
         geom_smooth(method=lm,se=FALSE, colour = "dark grey", size = 0.5) +
         geom_point(alpha = .7, size = 3, aes(colour = as.factor(line)), show.legend=F) +
-        annotate("text", x = -13000, y = 2.1, label =  paste0(la_la,"%"), size = 6, family = "mono") +
-        annotate("text", x = -13000, y = 0.4, label =  paste0(la_gs,"%"), size = 6, family = "mono") +
-        annotate("text", x = 4300, y = 2.1, label =  paste0(ga_la,"%"), size = 6, family = "mono") +
-        annotate("text", x = 4300, y = 0.4, label =  paste0(ga_gs,"%"), size = 6, family = "mono") +
-        annotate("text", x = 4300, y = 2.5, label =  paste0("TEST"), size = 6, family = "mono") +
-        theme_minimal(base_family = 'mono', base_size = 18) 
+        annotate("text", x = 2, y = 2.1, label =  paste0(la_la,"%", "\n loss averse & \n loss vigilant "), size = 3, family = "mono") +
+        annotate("text", x = 2, y = 0.41, label =  paste0(la_gs,"%", "\n gain seeking & \n loss vigilant "), size = 3, family = "mono") +
+        annotate("text", x = 0.75, y = 2.1, label =  paste0(ga_la,"%", "\n loss averse & \n gain vigilant "), size = 3, family = "mono") +
+        annotate("text", x = 0.75, y = 0.41, label =  paste0(ga_gs,"%", "\n gain seeking & \n gain vigilant "), size = 3, family = "mono") +
+        #annotate("text", x = 4300, y = 2.5, label =  paste0("TEST"), size = 6, family = "mono") +
+        theme_minimal(base_family = 'mono', base_size = 18)  
 
   
-    ggsave('plots/aversion_attention_open_time.png', width = 6, height = 6,  dpi = 300) 
+    #ggsave('plots/aversion_attention_open_time.png', width = 6, height = 6,  dpi = 300) 
  
 # Appendix - Figures gain-loss split on trials and mouse-click ----
   library(gridExtra)
@@ -183,7 +220,7 @@ library(tidyverse)
   
   out <- grid.arrange(p1, p2, nrow = 1)
   
-  ggsave('plots/appendix_gain_loss_comparison.png', out)  
+  #ggsave('plots/appendix_gain_loss_comparison.png', out)  
 
   
 # Figure 5: Loss aversion as a function of vigilance to losses and gains -----
@@ -239,11 +276,10 @@ library(tidyverse)
     open_time %>%
     select(subject, gambletype, time) %>%
     spread(gambletype, time) %>%
-    mutate(asymmetry_box = gain - loss)
+    mutate(asymmetry_box = loss/gain)
   
-  open_time$asymmetry_box <- open_time$gain - open_time$loss
-  open_time$line <- ifelse(open_time$asymmetry_box > 0, 0,
-                           ifelse(open_time$asymmetry_box < 0, 1, "NA"))
+  open_time$line <- ifelse(open_time$asymmetry_box < 1, 0,
+                           ifelse(open_time$asymmetry_box > 1, 1, "NA"))
   names(lambdas)[names(lambdas) == "id"] <- "subject"
   
   open_time <- merge(results_lambdas, open_time, by = "subject") # Some subjects were removed based on missing values
@@ -259,16 +295,16 @@ library(tidyverse)
     xlab(paste('Relative box opening time')) +
     ylab(expression(paste("Loss aversion (",lambda, ") "))) +
     annotate("rect", xmin=-Inf, xmax=Inf, ymin=1, ymax=Inf, fill = "dark grey", alpha = 0.3) +
-    annotate("rect", xmin=-Inf, xmax=0, ymin=-Inf, ymax=Inf, fill = "lightblue", alpha = 0.3) +
-    annotate("text", x = -12000, y = 2.15, label =  paste0(la_la,"%", "\n loss averse & \n loss vigilant "), size = 3, family = "mono") +
-    annotate("text", x = -12000, y = 0.4, label =  paste0(la_gs,"%", "\n gain seeking & \n loss vigilant "), size = 3, family = "mono") +
-    annotate("text", x = 2500, y = 2.15, label =  paste0(ga_la,"%", "\n loss averse & \n gain vigilant "), size = 3, family = "mono") +
-    annotate("text", x = 2500, y = 0.4, label =  paste0(ga_gs,"%", "\n gain seeking & \n gain vigilant "), size = 3, family = "mono") +
+    annotate("rect", xmin=1, xmax=Inf, ymin=-Inf, ymax=Inf, fill = "lightblue", alpha = 0.3) +
+    annotate("text", x = 2, y = 2.15, label =  paste0(la_la,"%", "\n loss averse & \n loss vigilant "), size = 3, family = "mono") +
+    annotate("text", x = 2, y = 0.4, label =  paste0(la_gs,"%", "\n gain seeking & \n loss vigilant "), size = 3, family = "mono") +
+    annotate("text", x = 0.75, y = 2.15, label =  paste0(ga_la,"%", "\n loss averse & \n gain vigilant "), size = 3, family = "mono") +
+    annotate("text", x = 0.75, y = 0.4, label =  paste0(ga_gs,"%", "\n gain seeking & \n gain vigilant "), size = 3, family = "mono") +
     theme_minimal(base_family = 'mono', base_size = 18) +
     geom_smooth(method=lm,se=FALSE, colour = "dark grey", size = 0.5) +
     geom_point(alpha = .7, size = 3, aes(colour = as.factor(line)), show.legend=F) 
   
-  ggsave('plots/aversion_attention_open_time.png', width = 6, height = 6,  dpi = 300)
+  #ggsave('plots/aversion_attention_open_time.png', width = 6, height = 6,  dpi = 300)
   
   
 
@@ -286,34 +322,11 @@ nrow(subset(open_time, line == 1 & mean_median_lambda < 1)) # Loss attention & g
 nrow(subset(open_time, line == 0 & mean_median_lambda > 1)) # Gain attention & loss aversion
 nrow(subset(open_time, line == 0 & mean_median_lambda < 1)) # Gain attention & gain aversion
 
-# Between-gamble transitions
-nrow(subset(transitions_b, line == 1)) # Loss attention
-nrow(subset(transitions_b, line == 0)) # Gain attention
-nrow(subset(transitions_b, line == 1 & mean_median_lambda > 1)) # Loss attention & loss aversion
-nrow(subset(transitions_b, line == 1 & mean_median_lambda < 1)) # Loss attention & gain aversion
-nrow(subset(transitions_b, line == 0 & mean_median_lambda > 1)) # Gain attention & loss aversion
-nrow(subset(transitions_b, line == 0 & mean_median_lambda < 1)) # Gain attention & gain aversion
-
-# Within-gamble transitions
-nrow(subset(transitions_w, line == 1)) # Loss attention
-nrow(subset(transitions_w, line == 0)) # Gain attention
-nrow(subset(transitions_w, line == 1 & mean_median_lambda > 1)) # Loss attention & loss aversion
-nrow(subset(transitions_w, line == 1 & mean_median_lambda < 1)) # Loss attention & gain aversion
-nrow(subset(transitions_w, line == 0 & mean_median_lambda > 1)) # Gain attention & loss aversion
-nrow(subset(transitions_w, line == 0 & mean_median_lambda < 1)) # Gain attention & gain aversion
-
 
 # Stats for paper
 round(mean(results_lambdas$mean_median_lambda), 2)
 round(sd(results_lambdas$mean_median_lambda), 2)
-
 cor.test(open_time$mean_median_lambda, open_time$asymmetry_box, method = "spearman")
-cor.test(transitions_b$mean_median_lambda, transitions_b$asymmetry_trans, method = "spearman")
-cor.test(transitions_w$mean_median_lambda, transitions_w$asymmetry_trans, method = "spearman")
-
-
-
-
 
 
 # Conceptual discussion of loss aversion in McDermott et al.'s (2008) survival function ----
@@ -378,4 +391,4 @@ ggplot(data = data.frame(x = 0), mapping = aes(x = x)) +
                                                                       expression(mu == tau), 
                                                                       expression(mu > tau)))
 
-ggsave("plots/sensitivity_theory.png", width = 6, height = 5,  dpi = 300)
+#ggsave("plots/sensitivity_theory.png", width = 6, height = 5,  dpi = 300)
