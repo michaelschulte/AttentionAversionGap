@@ -1,7 +1,7 @@
-# export choices for CPT modeling ----
+# The Attention-Aversion Gap
+# Tomas Lejarraga, Michael Schulte-Mecklenbeck, Thorsten Pachur, Ralph Hertwig
 
-# format for WinBugs
-# block of gain gambles, then loss gambles, then mixed gambles.
+# export choices for CPT modeling ----
 
 # load library
 library(tidyverse)
@@ -221,27 +221,3 @@ write_delim(gambleA, ('CPTModeling/GambleA.txt'), delim = '\t', col_names = FALS
 write_delim(gambleB, ('CPTModeling/GambleB.txt'), delim = '\t', col_names = FALSE)
 
 
-#### get problem solved with help from stackoverflow ### ----  
-full <- 
-  data.frame(id = seq(1,5))
-
-problem <- 
-  data.frame(id = c(c(1,2,4,5),c(1,3,4,5)), group = c(rep(1,4), rep(2,4)), target = c(rep(c('A','B'),4)))
-
-problem %>%
-  complete(id, group) # for all combinations of two dataframes
-####
-
-### Thomas takes care of mixed gamble recoding - but Michael was faster doing this manually
-
-rm(list=ls())
-setwd("~/Desktop")
-data <- read.table("GambleA.txt")
-
-data$outcome_1 <- ifelse(data$V1 >= 0 & data$V3 >= 0, data$V1,
-                         ifelse(data$V1 <= 0 & data$V3 <= 0, data$V1,
-                                ifelse(data$V1 >= 0, data$V1, data$V3)))
-
-data$outcome_2 <- ifelse(data$V1 >= 0 & data$V3 >= 0, data$V3,
-                         ifelse(data$V1 <= 0 & data$V3 <= 0, data$V3,
-                                ifelse(data$V3 > 0, data$V1, data$V3)))

@@ -1,5 +1,6 @@
-# Loss Vigilance
-# Tomas Lejarraga, Michael Schulte-Mecklenbeck
+# The Attention-Aversion Gap
+# Tomas Lejarraga, Michael Schulte-Mecklenbeck, Thorsten Pachur, Ralph Hertwig
+
 # data cleaning
 
 # packages

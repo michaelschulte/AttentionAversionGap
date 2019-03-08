@@ -1,5 +1,5 @@
-# Loss Vigilance
-# Michael Schulte-Mecklenbeck, Tomas Lejarraga
+# The Attention-Aversion Gap
+# Tomas Lejarraga, Michael Schulte-Mecklenbeck, Thorsten Pachur, Ralph Hertwig
 # Codebook rawclean100.Rdata 
 
   # id: unique task id
