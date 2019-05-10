@@ -10,6 +10,10 @@ library(tidyverse); library(pBrackets); library(Cairo); library(gridExtra)
   load('data/rawclean.Rdata')
   
 # Figure 2. Do losses prompt more visual attention than gains? Aggregate analysis
+  boxes <- c(
+    Outcome = "Boxes with outcome \n information",
+    Probability = "Boxes with probability \n information")
+  
   rawclean %>%
     group_by(trial, subject, task, type, gambletype) %>%
     summarise(overall_time = sum(boxtime)) %>%
@@ -18,9 +22,9 @@ library(tidyverse); library(pBrackets); library(Cairo); library(gridExtra)
     ggplot(., (aes(x = gambletype, y = time, colour = gambletype))) + 
     stat_summary(fun.y = mean, geom = "point", size = 1.6) +
     stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2, size = 1.2) +  
-    facet_grid(. ~ type) + 
+    facet_grid(. ~ type, labeller = labeller(type = boxes)) + 
     xlab('Problem domain') + 
-    ylab('Average time in milliseconds') +
+    ylab('Average opening time (ms)') +
     scale_colour_manual(values = c("loss" = "dark red", "gain" = "dark green", "mixed" = "black")) +
     scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
     theme_minimal(base_family = 'mono', base_size = 18) +
@@ -47,11 +51,11 @@ library(tidyverse); library(pBrackets); library(Cairo); library(gridExtra)
     geom_abline(intercept = 0, colour = 'Grey') +
     geom_point(alpha = .2, size = 3, aes(colour = as.factor(line)), show.legend=F) +
     scale_color_manual(values = c("1" = "dark red", "0" = "dark green")) +
-    xlab('Loss') +
-    ylab('Gain') +
+    xlab('Average opening time (ms) \n in loss problems') +
+    ylab('Average opening time (ms) \n in gain problems') +
     ylim(0,26000) + 
     xlim(0,26000) + 
-    facet_grid(. ~ type) +
+    facet_grid(. ~ type, labeller = labeller(type = boxes)) + 
     theme_minimal(base_family = 'mono', base_size = 18) 
   
   #ggsave('plots/gain_loss_within.png', height = 5, width = 10)
@@ -121,20 +125,20 @@ library(tidyverse); library(pBrackets); library(Cairo); library(gridExtra)
   
   ggplot(open_time, aes(asymmetry_box, mean_lambda)) +
     scale_color_manual(values = c("1" = "dark red", "0" = "dark green")) +
-    xlab(paste('Relative box opening time')) +
+    xlab(paste('Ratio of box opening time \n in loss to gain problems')) +
     ylab(expression(paste("Loss aversion (",lambda, ") "))) +
     annotate("rect", xmin=-Inf, xmax=Inf, ymin=1, ymax=Inf, fill = "dark grey", alpha = 0.3) +
     annotate("rect", xmin=1, xmax=Inf, ymin=-Inf, ymax=Inf, fill = "lightblue", alpha = 0.3) +
-    annotate("text", x = 2, y = 1.45, label =  paste0(la_la,"%", "\n loss attentive & \n loss averse "), size = 3, family = "mono") +
-    annotate("text", x = 2, y = 0.35, label =  paste0(la_gs,"%", "\n loss attentive & \n gain seeking "), size = 3, family = "mono") +
-    annotate("text", x = 0.73, y = 1.45, label =  paste0(ga_la,"%", "\n gain attentive & \n loss averse "), size = 3, family = "mono") +
-    annotate("text", x = 0.73, y = 0.35, label =  paste0(ga_gs,"%", "\n gain attentive & \n gain seeking "), size = 3, family = "mono") +
+    annotate("text", x = 2, y = 1.33, label =  paste0(la_la,"%", "\n loss attentive \n & \n loss averse "), size = 4, family = "mono") +
+    annotate("text", x = 2, y = 0.5, label =  paste0(la_gs,"%", "\n loss attentive \n & \n gain seeking "), size = 4, family = "mono") +
+    annotate("text", x = 0.73, y = 1.33, label =  paste0(ga_la,"%", "\n gain attentive \n & \n loss averse "), size = 4, family = "mono") +
+    annotate("text", x = 0.73, y = 0.5, label =  paste0(ga_gs,"%", "\n gain attentive \n & \n gain seeking "), size = 4, family = "mono") +
     theme_minimal(base_family = 'mono', base_size = 18) +
     geom_smooth(method=lm,se=FALSE, colour = "dark grey", size = 0.5) +
     geom_point(alpha = .7, size = 3, aes(colour = as.factor(line)), show.legend=F)  +
     scale_y_continuous(breaks=c(0.6, 1, 1.4))
   
-  ggsave('plots/aversion_attention_open_time.png', width = 6, height = 6,  dpi = 300)
+  ggsave('plots/aversion_attention_open_time.png', width = 7, height = 7,  dpi = 300)
   
   # Count cases
   
