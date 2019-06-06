@@ -138,7 +138,7 @@ library(tidyverse); library(pBrackets); library(Cairo); library(gridExtra)
     geom_point(alpha = .7, size = 3, aes(colour = as.factor(line)), show.legend=F)  +
     scale_y_continuous(breaks=c(0.6, 1, 1.4))
   
-  ggsave('plots/aversion_attention_open_time.png', width = 7, height = 7,  dpi = 300)
+  #ggsave('plots/aversion_attention_open_time.png', width = 7, height = 7,  dpi = 300)
   
   # Count cases
   
@@ -222,6 +222,8 @@ ggplot(data = data.frame(x = 0), mapping = aes(x = x)) +
 
 # Figure 6. Analysis of boxtime openings
 
+rawclean$study <- replace(rawclean$study, rawclean$study=="mouse", "mouseover")
+
 p1 <- 
   rawclean %>%
   filter(!celltypeF == 'Butt') %>%
@@ -241,7 +243,7 @@ p1 <-
   scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
   theme_minimal(base_family = 'mono', base_size = 18) +
   theme(legend.position="none") +
-  ggtitle('Trial 1')
+  ggtitle('Session 1')
 
 p2 <- 
   rawclean %>%
@@ -262,11 +264,11 @@ p2 <-
   scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
   theme_minimal(base_family = 'mono', base_size = 18) +
   theme(legend.position="none")+
-  ggtitle('Trial 2')
+  ggtitle('Session 2')
 
 out <- grid.arrange(p1, p2, nrow = 1)
 
-#ggsave('plots/appendix_gain_loss_comparison.png', out)
+#ggsave('plots/appendix_gain_loss_comparison_new.png', out)
 
 p3 <- 
   rawclean %>%
@@ -288,7 +290,7 @@ p3 <-
   scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
   theme_minimal(base_family = 'mono', base_size = 18) +
   theme(legend.position="none") +
-  ggtitle('Trial 1')
+  ggtitle('Session 1')
 
 p4 <- 
   rawclean %>%
@@ -310,9 +312,9 @@ p4 <-
   scale_x_discrete(labels = c("loss" = "Loss","gain" = "Gain", "mixed" = "Mixed")) +
   theme_minimal(base_family = 'mono', base_size = 18) +
   theme(legend.position="none")+
-  ggtitle('Trial 2')
+  ggtitle('Session 2')
 
 out_excl <- grid.arrange(p3, p4, nrow = 1)
 
-#ggsave('plots/appendix_gain_loss_excl_comparison.png', out)
+#ggsave('plots/appendix_gain_loss_excl_comparison_new.png', out)
 
